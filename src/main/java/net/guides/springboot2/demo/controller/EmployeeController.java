@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,13 +23,21 @@ import com.companyname.demo.exception.ResourceNotFoundException;
 
 import net.guides.springboot2.demo.model.Employee;
 import net.guides.springboot2.demo.repository.EmployeeRepository;
+import net.guides.springboot2.demo.service.EmployeeService;
 
 
-@RestController @CrossOrigin(origins = "http://localhost:4200")
+@RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api/v1")
 public class EmployeeController {
+	
+
+	
 	@Autowired
-    private EmployeeRepository employeeRepository;
+    private EmployeeService employeeService;
+	
+	@Autowired
+	private EmployeeRepository employeeRepository;
 
     @GetMapping("/employees")
     public List<Employee> getAllEmployees() {
@@ -37,8 +47,8 @@ public class EmployeeController {
     @GetMapping("/employees/{id}")
     public ResponseEntity<Employee> getEmployeeById(@PathVariable(value = "id") Long employeeId)
         throws ResourceNotFoundException {
-        Employee employee = employeeRepository.findById(employeeId)
-          .orElseThrow(() -> new ResourceNotFoundException("Employee not found for this id :: " + employeeId));
+        Employee employee = employeeService.FetchEmployee(employeeId);
+         // .orElseThrow(() -> new ResourceNotFoundException("Employee not found for this id :: " + employeeId));
         return ResponseEntity.ok().body(employee);
     }
     
